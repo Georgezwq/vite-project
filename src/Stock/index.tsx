@@ -1,5 +1,5 @@
 const Stock = () => {
-  return <div>Stock</div>;
+  return <div>股票</div>;
 };
 
 export default Stock;
