@@ -3,17 +3,26 @@ import { Button } from "antd";
 
 const EntryPoint = () => {
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        marginTop: "100px",
+        marginLeft: "100px",
+      }}
+    >
       <Link to="/home">
         <Button>
           <span>回到主页</span>
         </Button>
       </Link>
-      <Link to="/home/stock">
-        <Button>
-          <span>查看股票</span>
-        </Button>
-      </Link>
+      <div style={{ marginLeft: "100px" }}>
+        <Link to="/home/stock">
+          <Button>
+            <span>查看股票</span>
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
