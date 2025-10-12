@@ -6,4 +6,5 @@ export default defineConfig({
   server: {
     open: true, // 自动打开浏览器
   },
+  base: "/vite-project/",
 });
