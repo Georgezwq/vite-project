@@ -1,9 +1,18 @@
-import { Button, Table } from "antd";
+import { Button, Grid, Pagination, Table } from "antd";
 import { useEffect, useState } from "react";
+import "./index.css";
+
+const { useBreakpoint } = Grid;
 
 const Stock = () => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [stockPrice, setStockPrice] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [current, setCurrent] = useState(1);
+  const pageSize = 5;
+
   const symbols = ["AAPL", "BRK B", "FFAI", "GME", "NIO", "TSLA"];
   const encodedSymbols = symbols.join(",");
   const fetchPrice = async () => {
@@ -28,7 +37,12 @@ const Stock = () => {
     fetchPrice();
   }, []);
   const columns = [
-    { title: "股票代码", dataIndex: "symbol", key: "symbol" },
+    {
+      title: "股票代码",
+      dataIndex: "symbol",
+      key: "symbol",
+      fixed: "left" as const,
+    },
     {
       title: "当前价格",
       dataIndex: "price",
@@ -57,26 +71,54 @@ const Stock = () => {
       },
       sorter: (a: any, b: any) => b.marketCap - a.marketCap,
     },
+    {
+      title: "涨跌价格",
+      dataIndex: "change",
+      key: "change",
+      render: (text: any) => text.toFixed(2),
+      sorter: (a: any, b: any) => b.change - a.change,
+    },
   ];
 
   return (
     <div>
-      <Button
-        onClick={fetchPrice}
-        style={{ marginLeft: "30px", marginTop: "30px" }}
-      >
-        {loading ? "加载中..." : "查看股票"}
-      </Button>
-      <Table columns={columns} dataSource={stockPrice} rowKey="symbol" />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        America stock market
+      </div>
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          marginTop: "100px",
-          marginLeft: "100px",
+          justifyContent: "end",
+          marginTop: "5px",
+          marginBottom: "5px",
         }}
-      ></div>
+      >
+        <Button
+          onClick={fetchPrice}
+          style={{ marginRight: "30px", marginTop: isMobile ? 0 : "30px" }}
+        >
+          {loading ? "加载中..." : "查看股票"}
+        </Button>
+      </div>
+      <div className="table-hscroll">
+        <Table
+          columns={columns}
+          dataSource={stockPrice}
+          rowKey="symbol"
+          pagination={false}
+        />
+      </div>
+      <div
+        style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}
+      >
+        <Pagination
+          current={current}
+          pageSize={pageSize}
+          total={stockPrice.length}
+          onChange={(p) => setCurrent(p)}
+          showSizeChanger={false}
+        />
+      </div>
     </div>
   );
 };

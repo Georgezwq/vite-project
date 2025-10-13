@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
-import { Button } from "antd";
+import { Button, Grid } from "antd";
+
+const { useBreakpoint } = Grid;
 
 const EntryPoint = () => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: isMobile ? "column" : "row",
         marginTop: "100px",
         marginLeft: "100px",
       }}
@@ -16,7 +20,12 @@ const EntryPoint = () => {
           <span>回到主页</span>
         </Button>
       </Link>
-      <div style={{ marginLeft: "100px" }}>
+      <div
+        style={{
+          marginLeft: isMobile ? "0" : "100px",
+          marginTop: isMobile ? "60px" : "0",
+        }}
+      >
         <Link to="/home/stock">
           <Button>
             <span>查看股票</span>

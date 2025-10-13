@@ -1,0 +1,13 @@
+.table-hscroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 可选：滚动条稍微友好一点 */
+.table-hscroll::-webkit-scrollbar {
+  height: 8px;
+}
+.table-hscroll::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+}
