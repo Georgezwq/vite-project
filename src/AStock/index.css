@@ -1,0 +1,9 @@
+.table-hscroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .table-hscroll {
+    margin-bottom: 16px;
+  }
+}

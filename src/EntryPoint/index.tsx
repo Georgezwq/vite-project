@@ -28,9 +28,21 @@ const EntryPoint = () => {
       >
         <Link to="/home/stock">
           <Button>
-            <span>查看股票</span>
+            <span>查看美股</span>
           </Button>
-        </Link>
+        </Link>   
+      </div>
+       <div
+        style={{
+          marginLeft: isMobile ? "0" : "100px",
+          marginTop: isMobile ? "60px" : "0",
+        }}
+      >
+        <Link to="/home/Astock">
+          <Button>
+            <span>查看A股</span>
+          </Button>
+        </Link>   
       </div>
     </div>
   );
