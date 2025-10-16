@@ -108,8 +108,7 @@ const AStock = () => {
         };
       });
       
-      setStockPrice(mockData);
-      console.log("使用模拟A股数据", mockData);
+      setStockPrice(mockData);    
     } finally {
       setLoading(false);
     }
@@ -166,6 +165,7 @@ const AStock = () => {
         return text.toString();
       },
       sorter: (a: any, b: any) => b.marketCap - a.marketCap,
+      responsive: ["md"],
     },
     {
       title: "涨跌价格",
@@ -173,6 +173,7 @@ const AStock = () => {
       key: "change",
       render: (text: any) => text.toFixed(2),
       sorter: (a: any, b: any) => b.change - a.change,
+      responsive: ["md"],
     },
   ];
 
@@ -184,14 +185,14 @@ const AStock = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "end",
+          justifyContent: isMobile ? "center" : "end",
           marginTop: "5px",
           marginBottom: "5px",
         }}
       >
         <Button
           onClick={fetchPrice}
-          style={{ marginRight: "30px", marginTop: isMobile ? 0 : "30px" }}
+          style={{ marginRight: isMobile ? "0" : "30px", marginTop: isMobile ? "10px" : "30px" }}
         >
           {loading ? "加载中..." : "刷新行情"}
         </Button>
