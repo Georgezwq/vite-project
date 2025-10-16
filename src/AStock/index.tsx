@@ -46,7 +46,7 @@ const AStock = () => {
           document.body.removeChild(script); // Clean up the script tag
           resolve();
         };
-        script.onerror = (error) => {
+        script.onerror = () => {
           document.body.removeChild(script);
           reject(new Error('Failed to load stock data script.'));
         };
