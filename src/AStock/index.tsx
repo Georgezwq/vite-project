@@ -7,9 +7,10 @@ interface StockData {
   symbol: string;
   name: string;
   price: number;
-  change: number;
   changesPercentage: number;
   marketCap: number;
+  change: number;
+  // 根据实际数据结构，可能需要添加更多属性
 }
 
 const { useBreakpoint } = Grid;
@@ -23,8 +24,14 @@ const AStock = () => {
   const [current, setCurrent] = useState(1);
 
   // A股股票代码
-  const symbols = ["600519", "601318", "600036", "601166", "600276", "000858"];
-  const pageSize = symbols.length;
+  const symbols = [
+    "600519", "601318", "600036", "601166", "600276", "000858",
+    "000001", "000002", "000333", "000651", "000876", "002008",
+    "002230", "002415", "002460", "002594", "300059", "300751",
+    "600000", "600016", "600028", "600030", "600050", "600104",
+    "600196", "600271", "600309", "600438", "600585", "600690"
+  ];
+  const pageSize = 5;
   
   const fetchPrice = async () => { // Data fetching logic updated previously
     setLoading(true);
@@ -32,8 +39,10 @@ const AStock = () => {
       const formattedSymbols = symbols.map(symbol => {
         return symbol.startsWith('6') ? `sh${symbol}` : `sz${symbol}`;
       }).join(',');
+      console.log("Formatted Symbols:", formattedSymbols);
       
       const apiUrl = `https://qt.gtimg.cn/q=${formattedSymbols}`;
+      console.log("API URL:", apiUrl);
       
       // Dynamically create a script tag to bypass CORS
       const script: HTMLScriptElement = document.createElement('script');
@@ -52,7 +61,7 @@ const AStock = () => {
         };
       });
 
-      const stockData: any = [];
+      const stockData: StockData[] = [];
       
       // Iterate through the symbols and read the global variables
       symbols.forEach(symbol => {
@@ -61,9 +70,11 @@ const AStock = () => {
         
         // Access the global variable
         const rawData = (window as any)[globalVarName]; // Cast window to any to avoid TS error
+        console.log(`Raw Data for ${symbol}:`, rawData);
         
         if (rawData) {
           const data = rawData.split('~');
+          console.log(`Parsed Data for ${symbol}:`, data);
           if (data.length > 30) {
             const name = data[1];
             const price = parseFloat(data[3]);
@@ -89,7 +100,7 @@ const AStock = () => {
       }
       
       setStockPrice(stockData);
-      console.log("A股数据", stockData);
+      console.log("Final Stock Data:", stockData);
     } catch (error) {
       console.error("获取A股价格出错:", error);
       // Fallback to mock data
@@ -122,7 +133,31 @@ const AStock = () => {
       "600036": "招商银行",
       "601166": "兴业银行",
       "600276": "恒瑞医药",
-      "000858": "五粮液"
+      "000858": "五粮液",
+      "000001": "平安银行",
+      "000002": "万科A",
+      "000333": "美的集团",
+      "000651": "格力电器",
+      "000876": "新希望",
+      "002008": "大族激光",
+      "002230": "科大讯飞",
+      "002415": "海康威视",
+      "002460": "赣锋锂业",
+      "002594": "比亚迪",
+      "300059": "东方财富",
+      "300751": "迈瑞医疗",
+      "600000": "浦发银行",
+      "600016": "民生银行",
+      "600028": "中国石化",
+      "600030": "中信证券",
+      "600050": "中国联通",
+      "600104": "上海汽车",
+      "600196": "复星医药",
+      "600271": "航天信息",
+      "600309": "万华化学",
+      "600438": "通威股份",
+      "600585": "海螺水泥",
+      "600690": "青岛海尔"
     };
     return nameMap[symbol] || `股票${symbol}`;
   };
@@ -137,43 +172,40 @@ const AStock = () => {
       dataIndex: "symbol",
       key: "symbol",
       fixed: "left" as const,
+      width: 100,
     },
     {
       title: "当前价格",
       dataIndex: "price",
       key: "price",
-      render: (text: any) => text.toFixed(2),
-      sorter: (a: any, b: any) => b.price - a.price,
+      width: 120,
+      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) : ''),
+      sorter: (a: StockData, b: StockData) => b.price - a.price,
     },
-    { title: "公司名称", dataIndex: "name", key: "name" },
+    { title: "公司名称", dataIndex: "name", key: "name", width: 150 },
     {
       title: "涨跌幅",
       dataIndex: "changesPercentage",
       key: "changesPercentage",
-      render: (text: any) => text.toFixed(2) + "%",
-      sorter: (a: any, b: any) => b.changesPercentage - a.changesPercentage,
+      width: 100,
+      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) + "%" : ''),
+      sorter: (a: StockData, b: StockData) => b.changesPercentage - a.changesPercentage,
     },
     {
       title: "市值",
       dataIndex: "marketCap",
       key: "marketCap",
-      render: (text: any) => {
-        if (text >= 1e12) return (text / 1e12).toFixed(2) + "万亿";
-        if (text >= 1e9) return (text / 1e9).toFixed(2) + "亿";
-        if (text >= 1e6) return (text / 1e6).toFixed(2) + "百万";
-        if (text >= 1e3) return (text / 1e3).toFixed(2) + "千";
-        return text.toString();
-      },
-      sorter: (a: any, b: any) => b.marketCap - a.marketCap,
-      responsive: ["md"],
+      width: 100,
+      render: (text: number) => (text !== undefined && text !== null ? (text / 1000000).toFixed(2) + "M" : ''),
+      sorter: (a: StockData, b: StockData) => b.marketCap - a.marketCap,
     },
     {
       title: "涨跌价格",
       dataIndex: "change",
-      key: "change",
-      render: (text: any) => text.toFixed(2),
-      sorter: (a: any, b: any) => b.change - a.change,
-      responsive: ["md"],
+      key: "changes",
+      width: 100,
+      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) : ''),
+      sorter: (a: StockData, b: StockData) => b.change - a.change,
     },
   ];
 
@@ -192,7 +224,7 @@ const AStock = () => {
       >
         <Button
           onClick={fetchPrice}
-          style={{ marginRight: isMobile ? "0" : "30px", marginTop: isMobile ? "10px" : "30px" }}
+          style={{ marginRight: isMobile ? "0" : "30px", marginTop: isMobile ? "0" : "30px" }}
         >
           {loading ? "加载中..." : "刷新行情"}
         </Button>
@@ -200,13 +232,22 @@ const AStock = () => {
       <div className="table-hscroll">
         <Table
           columns={columns}
-          dataSource={stockPrice}
-          rowKey="symbol"
+          dataSource={(() => {
+            const startIndex = (current - 1) * pageSize;
+            const endIndex = current * pageSize;
+            const currentPageData = stockPrice.slice(startIndex, endIndex);
+            const paddedData = [...currentPageData];
+            while (paddedData.length < pageSize) {
+              paddedData.push({} as StockData);
+            }
+            return paddedData;
+          })()}
           pagination={false}
+          rowKey={(record: StockData, index: number) => record.symbol || index}
         />
       </div>
       <div
-        style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}
+        style={{ display: "flex", justifyContent: "center", marginTop: 8 }}
       >
         <Pagination
           current={current}
