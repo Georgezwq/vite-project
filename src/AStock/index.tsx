@@ -69,7 +69,7 @@ const AStock = () => {
         const globalVarName = `v_${fullCode}`;
         
         // Access the global variable
-        const rawData = (window as any)[globalVarName]; // Cast window to any to avoid TS error
+        const rawData = (window as unknown as Record<string, string | undefined>)[globalVarName]; // 使用更精确的类型断言替代 any
         console.log(`Raw Data for ${symbol}:`, rawData);
         
         if (rawData) {
@@ -238,12 +238,19 @@ const AStock = () => {
             const currentPageData = stockPrice.slice(startIndex, endIndex);
             const paddedData = [...currentPageData];
             while (paddedData.length < pageSize) {
-              paddedData.push({} as StockData);
+              paddedData.push({
+                symbol: `empty-${paddedData.length}`,
+                name: '',
+                price: 0,
+                changesPercentage: 0,
+                marketCap: 0,
+                change: 0,
+              });
             }
             return paddedData;
           })()}
           pagination={false}
-          rowKey={(record: StockData, index: number) => record.symbol || index}
+          rowKey={(record: StockData, index?: number) => record.symbol || String(index)}
         />
       </div>
       <div
