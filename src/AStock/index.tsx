@@ -1,4 +1,4 @@
-import { Button, Grid, Pagination, Table, Row, Col, Select } from "antd";
+import { Button, Grid, Table, Row, Col, Select } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import "./index.css";
