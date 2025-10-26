@@ -38,7 +38,7 @@ const EntryPoint = () => {
           marginTop: isMobile ? "60px" : "0",
         }}
       >
-        <Link to="/home/Astock">
+        <Link to="/home/astock">
           <Button>
             <span>查看A股</span>
           </Button>

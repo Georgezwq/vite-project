@@ -1,4 +1,4 @@
-import { Button, Grid, Pagination, Table } from "antd";
+import { Button, Grid, Pagination, Table, Row, Col, Select } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import "./index.css";
@@ -168,69 +168,113 @@ const AStock = () => {
   
   const columns: ColumnType<StockData>[] = [
     {
-      title: "股票代码",
-      dataIndex: "symbol",
-      key: "symbol",
+      title: "公司信息",
+      key: "companyInfo",
       fixed: "left" as const,
-      width: 100,
+      width: isMobile ? 95 : 110,
+      render: (_, record: StockData) => (
+        <div style={{ lineHeight: '1.2', paddingLeft: isMobile ? '2px' : '4px' }}>
+          <div style={{ fontWeight: 600, fontSize: '11px', marginBottom: '1px', color: '#1a365d' }}>
+            {record.name}
+          </div>
+          <div style={{ fontSize: '9px', color: '#4a5568', opacity: 0.8 }}>
+            {record.symbol}
+          </div>
+        </div>
+      ),
     },
     {
       title: "当前价格",
       dataIndex: "price",
       key: "price",
-      width: 120,
-      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) : ''),
+      width: isMobile ? 80 : 90,
+      render: (text: number) => (
+        <span style={{ fontWeight: 500, fontSize: '13px' }}>
+          {text !== undefined && text !== null ? `¥${text.toFixed(2)}` : ''}
+        </span>
+      ),
       sorter: (a: StockData, b: StockData) => b.price - a.price,
     },
-    { title: "公司名称", dataIndex: "name", key: "name", width: 150 },
     {
       title: "涨跌幅",
       dataIndex: "changesPercentage",
       key: "changesPercentage",
-      width: 100,
-      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) + "%" : ''),
+      width: isMobile ? 75 : 85,
+      render: (text: number) => {
+        if (text === undefined || text === null) return '';
+        const color = text >= 0 ? '#ff4d4f' : '#52c41a';
+        const bgColor = text >= 0 ? 'rgba(255, 77, 79, 0.1)' : 'rgba(82, 196, 26, 0.1)';
+        const prefix = text >= 0 ? '+' : '';
+        return (
+          <span style={{ 
+            color, 
+            backgroundColor: bgColor,
+            padding: '2px 6px',
+            borderRadius: '3px',
+            fontSize: '12px',
+            fontWeight: 500
+          }}>
+            {prefix}{text.toFixed(2)}%
+          </span>
+        );
+      },
       sorter: (a: StockData, b: StockData) => b.changesPercentage - a.changesPercentage,
+    },
+    {
+      title: "涨跌额",
+      dataIndex: "change",
+      key: "change",
+      width: isMobile ? 70 : 80,
+      render: (text: number) => {
+        if (text === undefined || text === null) return '';
+        const color = text >= 0 ? '#ff4d4f' : '#52c41a';
+        const prefix = text >= 0 ? '+' : '';
+        return (
+          <span style={{ color, fontSize: '12px', fontWeight: 500 }}>
+            {prefix}{text.toFixed(2)}
+          </span>
+        );
+      },
+      sorter: (a: StockData, b: StockData) => b.change - a.change,
     },
     {
       title: "市值",
       dataIndex: "marketCap",
       key: "marketCap",
-      width: 100,
-      render: (text: number) => (text !== undefined && text !== null ? (text / 1000000).toFixed(2) + "M" : ''),
+      width: isMobile ? 80 : 90,
+      render: (text: number) => {
+        if (text === undefined || text === null || text === 0) return '';
+        let displayText = '';
+        if (text >= 1e12) displayText = (text / 1e12).toFixed(1) + "万亿";
+        else if (text >= 1e8) displayText = (text / 1e8).toFixed(0) + "亿";
+        else if (text >= 1e4) displayText = (text / 1e4).toFixed(0) + "万";
+        else displayText = text.toString();
+        
+        return (
+          <span style={{ fontSize: '12px', color: '#4a5568' }}>
+            {displayText}
+          </span>
+        );
+      },
       sorter: (a: StockData, b: StockData) => b.marketCap - a.marketCap,
-    },
-    {
-      title: "涨跌价格",
-      dataIndex: "change",
-      key: "changes",
-      width: 100,
-      render: (text: number) => (text !== undefined && text !== null ? text.toFixed(2) : ''),
-      sorter: (a: StockData, b: StockData) => b.change - a.change,
-    },
+    }
   ];
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        中国A股市场
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: isMobile ? "center" : "end",
-          marginTop: "5px",
-          marginBottom: "5px",
-        }}
-      >
-        <Button
-          onClick={fetchPrice}
-          style={{ marginRight: isMobile ? "0" : "30px", marginTop: isMobile ? "0" : "30px" }}
-        >
-          {loading ? "加载中..." : "刷新行情"}
-        </Button>
-      </div>
+    <div className="astock-container">
+      <Row className="astock-header" justify="center" align="middle" style={{ marginBottom: "12px" }}>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12} style={{ textAlign: "center" }}>
+          <h2 className="astock-title" style={{ margin: 0 }}>中国A股市场</h2>
+        </Col>
+        <Col xs={24} sm={24} md={12} lg={12} xl={12} style={{ textAlign: isMobile ? "center" : "right", marginTop: isMobile ? "10px" : "0" }}>
+          <Button className="refresh-btn" onClick={fetchPrice} loading={loading}>
+            {loading ? "加载中..." : "刷新行情"}
+          </Button>
+        </Col>
+      </Row>
       <div className="table-hscroll">
         <Table
+          className="astock-table"
           columns={columns}
           dataSource={(() => {
             const startIndex = (current - 1) * pageSize;
@@ -251,19 +295,64 @@ const AStock = () => {
           })()}
           pagination={false}
           rowKey={(record: StockData, index?: number) => record.symbol || String(index)}
+          scroll={{ x: isMobile ? 320 : 365 }}
+          size="middle"
         />
       </div>
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: 8 }}
-      >
-        <Pagination
-          current={current}
-          pageSize={pageSize}
-          total={stockPrice.length}
-          onChange={(p) => setCurrent(p)}
-          showSizeChanger={false}
-        />
-      </div>
+      <Row justify="center" style={{ marginTop: 8 }}>
+        <Col>
+          <div className="custom-pagination">
+            {/* 自定义分页器 */}
+            <div className="custom-pagination-controls">
+              {/* 上一页按钮 */}
+              <Button
+                size="small"
+                disabled={current === 1}
+                onClick={() => setCurrent(current - 1)}
+                className="custom-pagination-btn"
+              >
+                ‹
+              </Button>
+              
+              {/* 当前页显示 */}
+              <span className="custom-pagination-current">
+                {current}
+              </span>
+              
+              {/* 下一页按钮 */}
+              <Button
+                size="small"
+                disabled={current === Math.ceil(stockPrice.length / pageSize)}
+                onClick={() => setCurrent(current + 1)}
+                className="custom-pagination-btn"
+              >
+                ›
+              </Button>
+            </div>
+            
+            {/* 页码选择下拉菜单 */}
+            <Select
+              value={current}
+              onChange={(value) => setCurrent(value)}
+              size="small"
+              className="custom-pagination-select"
+              style={{ minWidth: '80px' }}
+              placeholder="跳转"
+            >
+              {Array.from({ length: Math.ceil(stockPrice.length / pageSize) }, (_, i) => i + 1).map(page => (
+                <Select.Option key={page} value={page}>
+                  第 {page} 页
+                </Select.Option>
+              ))}
+            </Select>
+            
+            {/* 总页数显示 */}
+            <span className="custom-pagination-info">
+              共 {Math.ceil(stockPrice.length / pageSize)} 页
+            </span>
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 };
