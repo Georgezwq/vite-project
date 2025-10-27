@@ -11,3 +11,9 @@
 .table-hscroll::-webkit-scrollbar-thumb {
   border-radius: 4px;
 }
+
+/* 覆盖表头左固定列的渐变与层级 */
+.fix-left-override .ant-table-thead > tr > th.ant-table-cell-fix-left {
+  background: #fff !important;
+  z-index: 12 !important; /* 比 11 更高，避免被遮 */
+}

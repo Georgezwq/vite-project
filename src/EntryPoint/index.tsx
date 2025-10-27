@@ -30,9 +30,9 @@ const EntryPoint = () => {
           <Button>
             <span>查看美股</span>
           </Button>
-        </Link>   
+        </Link>
       </div>
-       <div
+      <div
         style={{
           marginLeft: isMobile ? "0" : "100px",
           marginTop: isMobile ? "60px" : "0",
@@ -42,7 +42,7 @@ const EntryPoint = () => {
           <Button>
             <span>查看A股</span>
           </Button>
-        </Link>   
+        </Link>
       </div>
     </div>
   );
