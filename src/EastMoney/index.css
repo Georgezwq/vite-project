@@ -1,0 +1,57 @@
+/* 东方财富风格（移动端优先） */
+/* 容器 */
+.em-container { padding: 12px; background: #f7f9fc; min-height: 100vh; }
+
+/* 顶部区域 */
+.em-top { background: linear-gradient(135deg, #ff6a00 0%, #ff3c00 100%); border-radius: 12px; padding: 10px; color: #fff; }
+.em-top-bar { display: flex; align-items: center; gap: 8px; }
+.em-top-left, .em-top-right { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.em-top-search .ant-input { border-radius: 20px; }
+.em-top-shortcuts { display: flex; justify-content: space-between; margin-top: 8px; }
+.em-shortcut { display: flex; flex-direction: column; align-items: center; }
+.em-shortcut-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+.em-shortcut-text { font-size: 12px; }
+
+/* 横幅 */
+.em-banner { margin-top: 10px; border-radius: 12px; padding: 12px; background: linear-gradient(135deg, #ff8a3c 0%, #ff5a1f 100%); color: #fff; text-align: center; }
+.em-banner-title { font-size: 18px; font-weight: 700; }
+.em-banner-sub { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+.em-banner-btn { margin-top: 8px; border-radius: 16px; background: #fff !important; color: #ff5a1f !important; border: none !important; }
+
+/* 功能网格 */
+.em-grid { margin-top: 10px; background: #fff; border-radius: 12px; padding: 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.em-grid-item { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; }
+.em-grid-icon { width: 32px; height: 32px; border-radius: 50%; background: #fff3e8; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(255, 90, 31, 0.2); margin-bottom: 4px; }
+.em-grid-text { font-size: 12px; color: #1a2740; }
+
+/* 推荐卡片行 */
+.em-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.em-card { border-radius: 12px; padding: 12px; color: #fff; }
+.em-card.orange { background: linear-gradient(135deg, #ff8a3c 0%, #ff5a1f 100%); }
+.em-card.blue { background: linear-gradient(135deg, #2770f8 0%, #1452c8 100%); }
+.em-card-title { font-weight: 700; }
+.em-card-sub { font-size: 12px; opacity: 0.95; margin-top: 2px; }
+.em-card-btn { margin-top: 8px; border-radius: 16px; background: rgba(255,255,255,0.92) !important; color: #1a2740 !important; border: none !important; }
+.em-dots { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+.dot { width: 6px; height: 6px; background: #ddd; border-radius: 50%; }
+.dot.active { background: #ff6a00; }
+
+/* Tabs */
+.em-tabs { margin-top: 10px; }
+.em-segmented .ant-segmented-item-selected { background: #ff6a00; color: #fff; }
+
+/* 信息流 */
+.em-feed { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.em-feed-item { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.em-feed-title { font-size: 14px; font-weight: 600; color: #1a2740; }
+.em-feed-meta { margin-top: 4px; font-size: 12px; color: #6b7a99; display: flex; gap: 10px; }
+.em-tag { color: #ff6a00; }
+
+/* 底部导航 */
+.em-footer { position: sticky; bottom: 0; margin-top: 12px; display: flex; justify-content: space-around; background: #fff; border-radius: 12px; padding: 8px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.em-footer-item { font-size: 12px; color: #1a2740; }
+.em-footer-item.active { color: #ff6a00; font-weight: 700; }
+
+@media (min-width: 768px) {
+  .em-container { padding: 16px 20px; }
+}

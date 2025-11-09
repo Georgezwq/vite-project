@@ -3,6 +3,7 @@ import Home from "./home";
 import EntryPoint from "./EntryPoint";
 import Stock from "./Stock";
 import AStock from "./AStock";
+import EastMoney from "./EastMoney";
 function App() {
   return (
     <Routes>
@@ -10,6 +11,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/home/stock" element={<Stock />} />
       <Route path="/home/astock" element={<AStock />} />
+      <Route path="/home/eastmoney" element={<EastMoney />} />
     </Routes>
   );
 }
