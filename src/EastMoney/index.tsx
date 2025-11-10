@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Grid, Segmented, Button, Input } from "antd";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const { useBreakpoint } = Grid;
 
@@ -15,6 +16,7 @@ const { useBreakpoint } = Grid;
 const EastMoneyMobile = () => {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+  const navigate = useNavigate();
 
   // 示例数据（后续可替换为真实接口数据）
   // const quotes = useMemo<QuoteItem[]>(
@@ -40,16 +42,34 @@ const EastMoneyMobile = () => {
       { key: "main", label: "主力建仓", icon: "🏗️" },
       { key: "more", label: "更多", icon: "➕" },
     ],
-    []
+    [],
   );
 
   const feed = useMemo(
     () => [
-      { id: 1, title: "统计局：10月份CPI同比上涨0.2% PPI环比转涨", tag: "要闻", time: "2分钟前", comments: 311 },
-      { id: 2, title: "半导体龙头回应：扩产储备芯片产能，供需改善", tag: "热门", time: "8分钟前", comments: 1024 },
-      { id: 3, title: "新能源车企发布销量快报，环比增长显著", tag: "发现", time: "12分钟前", comments: 508 },
+      {
+        id: 1,
+        title: "统计局：10月份CPI同比上涨0.2% PPI环比转涨",
+        tag: "要闻",
+        time: "2分钟前",
+        comments: 311,
+      },
+      {
+        id: 2,
+        title: "半导体龙头回应：扩产储备芯片产能，供需改善",
+        tag: "热门",
+        time: "8分钟前",
+        comments: 1024,
+      },
+      {
+        id: 3,
+        title: "新能源车企发布销量快报，环比增长显著",
+        tag: "发现",
+        time: "12分钟前",
+        comments: 508,
+      },
     ],
-    []
+    [],
   );
 
   return (
@@ -74,7 +94,15 @@ const EastMoneyMobile = () => {
             { k: "fund", t: "基金" },
             { k: "magic", t: "妙想" },
           ].map((s) => (
-            <div key={s.k} className="em-shortcut">
+            <div
+              key={s.k}
+              className="em-shortcut"
+              onClick={() => {
+                if (s.k === "hk") {
+                  navigate("/home/stock");
+                }
+              }}
+            >
               <div className="em-shortcut-icon">⭐</div>
               <div className="em-shortcut-text">{s.t}</div>
             </div>
@@ -86,7 +114,9 @@ const EastMoneyMobile = () => {
       <div className="em-banner">
         <div className="em-banner-title">你还没股票账户？</div>
         <div className="em-banner-sub">开户享更低佣金</div>
-        <Button size="small" className="em-banner-btn">立即办理</Button>
+        <Button size="small" className="em-banner-btn">
+          立即办理
+        </Button>
       </div>
 
       {/* 功能网格 */}
@@ -104,12 +134,16 @@ const EastMoneyMobile = () => {
         <div className="em-card orange">
           <div className="em-card-title">新人7天礼 🎁</div>
           <div className="em-card-sub">限时礼包待领取</div>
-          <Button size="small" className="em-card-btn">立即领取</Button>
+          <Button size="small" className="em-card-btn">
+            立即领取
+          </Button>
         </div>
         <div className="em-card blue">
           <div className="em-card-title">特色功能 玩赚股市</div>
           <div className="em-card-sub">百万股民正在使用</div>
-          <Button size="small" className="em-card-btn">立即探索</Button>
+          <Button size="small" className="em-card-btn">
+            立即探索
+          </Button>
         </div>
       </div>
       <div className="em-dots">
@@ -146,7 +180,12 @@ const EastMoneyMobile = () => {
         <div className="em-footer-item active">🏠 首页</div>
         <div className="em-footer-item">📊 行情</div>
         <div className="em-footer-item">📰 资讯</div>
-        <div className="em-footer-item">💼 行情</div>
+        <div
+          className="em-footer-item"
+          onClick={() => navigate("/home/astock")}
+        >
+          💼 行情
+        </div>
         <div className="em-footer-item">👤 我的</div>
       </div>
     </div>
