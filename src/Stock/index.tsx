@@ -1,4 +1,4 @@
-import { Button, Grid, Pagination, Table, ConfigProvider } from "antd";
+import { Button, Grid, Table } from "antd";
 import { useEffect, useState } from "react";
 import "./index.css";
 
@@ -10,8 +10,7 @@ const Stock = () => {
   const [stockPrice, setStockPrice] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [current, setCurrent] = useState(1);
-  const pageSize = 5;
+  // 移除未使用的分页状态，避免构建报错
 
   const symbols = ["AAPL", "BRK B", "FFAI", "GME", "NIO", "TSLA"];
   const encodedSymbols = symbols.join(",");
@@ -106,15 +105,15 @@ const Stock = () => {
             pagination={false}
           />
         </div>
-        {/* <div className="stock-pagination">
-          <Pagination
-            current={current}
-            pageSize={pageSize}
-            total={stockPrice.length}
-            onChange={(p) => setCurrent(p)}
-            showSizeChanger={false}
-          />
-        </div> */}
+        {/* 如需分页，请恢复以下代码并重新引入 Pagination：
+            <Pagination
+              current={current}
+              pageSize={pageSize}
+              total={stockPrice.length}
+              onChange={(p) => setCurrent(p)}
+              showSizeChanger={false}
+            />
+        */}
       </div>
   );
 };
