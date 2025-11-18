@@ -4,10 +4,19 @@ import "./index.css";
 
 const { useBreakpoint } = Grid;
 
+interface USQuote {
+  symbol: string;
+  price: number;
+  name: string;
+  changesPercentage: number;
+  marketCap: number;
+  change: number;
+}
+
 const Stock = () => {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
-  const [stockPrice, setStockPrice] = useState([]);
+  const [stockPrice, setStockPrice] = useState<USQuote[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 移除未使用的分页状态，避免构建报错
@@ -25,7 +34,7 @@ const Stock = () => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      setStockPrice(Array.isArray(data) ? data : []);
+      setStockPrice(Array.isArray(data) ? (data as USQuote[]) : []);
     } catch (error) {
       console.error("Error fetching stock prices:", error);
       const nameMap: Record<string, string> = {
@@ -36,7 +45,7 @@ const Stock = () => {
         NIO: "NIO Inc.",
         TSLA: "Tesla, Inc.",
       };
-      const mock = symbols.map((s) => {
+      const mock: USQuote[] = symbols.map((s) => {
         const price = Math.random() * 300 + 10;
         const change = (Math.random() - 0.5) * 10;
         const changesPercentage = (change / price) * 100;
