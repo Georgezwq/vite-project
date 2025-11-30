@@ -118,14 +118,14 @@ const Stock = () => {
             textAlign: "center",
           }}
         >
-          {text.toFixed(2)}
+          {text}
         </div>
       ),
     },
     {
       title: "涨跌幅",
       dataIndex: "changesPercentage",
-      render: (text: number) => `${text.toFixed(2)}%`,
+      render: (text: number) => `${text}%`,
     },
     // {
     //   title: "最新",
