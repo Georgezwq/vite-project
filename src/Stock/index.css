@@ -17,3 +17,20 @@
   background: #fff !important;
   z-index: 12 !important; /* 比 11 更高，避免被遮 */
 }
+
+.ant-table-cell {
+  text-align: center !important;
+}
+.delete-modal-area {
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.iconStyle {
+  font-size: 16px;
+}
