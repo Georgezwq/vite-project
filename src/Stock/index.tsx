@@ -107,8 +107,8 @@ const Stock = () => {
     },
     {
       title: "价格",
-      key: "price",
-      dataIndex: "price",
+      key: "c",
+      dataIndex: "c",
       render: (text: number) => (
         <div
           style={{
@@ -124,7 +124,8 @@ const Stock = () => {
     },
     {
       title: "涨跌幅",
-      dataIndex: "changesPercentage",
+      key: "d",
+      dataIndex: "d",
       render: (text: number) => `${text}%`,
     },
     // {
