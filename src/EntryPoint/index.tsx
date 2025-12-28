@@ -44,6 +44,18 @@ const EntryPoint = () => {
           </Button>
         </Link>
       </div>
+      <div
+        style={{
+          marginLeft: isMobile ? "0" : "100px",
+          marginTop: isMobile ? "60px" : "0",
+        }}
+      >
+        <Link to="/home/astock-old">
+          <Button>
+            <span>查看A股(旧版)</span>
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

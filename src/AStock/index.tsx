@@ -116,7 +116,6 @@ export default function AStock() {
       key: 'changePercent',
       render: (val: number) => {
         const isUp = val >= 0;
-        const color = isUp ? '#cf1322' : '#3f8600';
         return (
           <Tag color={isUp ? 'error' : 'success'} style={{ fontWeight: 'bold' }}>
             {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}

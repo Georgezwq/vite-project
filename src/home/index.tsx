@@ -13,6 +13,9 @@ const Home = () => {
         <Button onClick={() => navigate("/home/astock")}>去A股</Button>
       </div>
       <div>
+        <Button onClick={() => navigate("/home/astock-old")}>去A股(旧版)</Button>
+      </div>
+      <div>
         <Button onClick={() => navigate("/home/eastmoney")}>东方财富</Button>
       </div>
     </div>
