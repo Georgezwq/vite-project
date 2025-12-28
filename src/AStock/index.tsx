@@ -3,6 +3,10 @@ import type { TableProps } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 
+const BASE_API_URL = import.meta.env.PROD
+  ? 'https://georgezwq.github.io/api/eastmoney'
+  : '/api/eastmoney';
+
 interface StockData {
   name: string;
   symbol: string;
@@ -38,7 +42,7 @@ export default function AStock() {
         
         // 1. 获取实时数据
         const quoteRes = await fetch(
-          '/api/eastmoney/api/qt/stock/get?secid=105.TSLA&fields=f43,f44,f45,f46,f58,f60,f57,f169,f170'
+          `${BASE_API_URL}/api/qt/stock/get?secid=105.TSLA&fields=f43,f44,f45,f46,f58,f60,f57,f169,f170`
         );
         const quoteJson = await quoteRes.json();
 
@@ -46,7 +50,7 @@ export default function AStock() {
         // klt=101 (日K), lmt=50 (最近50条)
         // fields2: f51(日期), f52(开盘), f53(收盘), f54(最高), f55(最低), f56(成交量), f57(成交额), f58(振幅), f59(涨跌幅), f60(涨跌额), f61(换手率)
         const historyRes = await fetch(
-          '/api/eastmoney/kline/api/qt/stock/kline/get?secid=105.TSLA&klt=101&fqt=1&lmt=50&end=20990101&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f59'
+          `${BASE_API_URL}/kline/api/qt/stock/kline/get?secid=105.TSLA&klt=101&fqt=1&lmt=50&end=20990101&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f59`
         );
         const historyJson = await historyRes.json();
         
