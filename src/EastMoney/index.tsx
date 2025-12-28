@@ -90,7 +90,7 @@ const EastMoneyMobile = () => {
         <div className="em-top-shortcuts">
           {[
             { k: "hk", t: "港美" },
-            { k: "fut", t: "期货" },
+            { k: "As", t: "A股" },
             { k: "fund", t: "基金" },
             { k: "magic", t: "妙想" },
           ].map((s) => (
@@ -100,6 +100,8 @@ const EastMoneyMobile = () => {
               onClick={() => {
                 if (s.k === "hk") {
                   navigate("/home/stock");
+                }else if(s.k === "As"){
+                  navigate("/home/astock");
                 }
               }}
             >

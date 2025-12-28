@@ -56,6 +56,28 @@ const Stock = () => {
     }
   };
 
+    const fetchPricezwq = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://financialmodelingprep.com/stable/search-exchange-variants?symbol=AAPL&apikey=T6HkJ3q670Hofj80UCzZS134Iuk6igwd`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setStockPrice(data);
+      console.log("data", data);
+    } catch (error) {
+      console.error("Error fetching stock prices:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchPricezwq();
+  }, []);
+
   const fetchPrice = async () => {
     setLoading(true);
     try {

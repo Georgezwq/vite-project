@@ -1,360 +1,203 @@
-import { Button, Grid, Table, Row, Col, Select } from "antd";
-import type { ColumnType } from "antd/es/table";
-import { useEffect, useState } from "react";
-import "./index.css";
+import { Card, Descriptions, Spin, Statistic, Table, Tabs, Tag } from 'antd';
+import type { TableProps } from 'antd';
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 
 interface StockData {
-  symbol: string;
   name: string;
+  symbol: string;
   price: number;
-  changesPercentage: number;
-  marketCap: number;
+  open: number;
+  high: number;
+  low: number;
+  prevClose: number;
   change: number;
-  // 根据实际数据结构，可能需要添加更多属性
+  changePercent: number;
 }
 
-const { useBreakpoint } = Grid;
+interface KlineData {
+  date: string;
+  open: number;
+  close: number;
+  high: number;
+  low: number;
+  volume: number;
+  changePercent: number;
+}
 
-const AStock = () => {
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
-  const [stockPrice, setStockPrice] = useState<StockData[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function AStock() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<StockData | null>(null);
+  const [history, setHistory] = useState<KlineData[]>([]);
+  const [error, setError] = useState<string>('');
 
-  const [current, setCurrent] = useState(1);
-
-  // A股股票代码
-  const symbols = [
-    "600519", "601318", "600036", "601166", "600276", "000858",
-    "000001", "000002", "000333", "000651", "000876", "002008",
-    "002230", "002415", "002460", "002594", "300059", "300751",
-    "600000", "600016", "600028", "600030", "600050", "600104",
-    "600196", "600271", "600309", "600438", "600585", "600690"
-  ];
-  const pageSize = 5;
-  
-  const fetchPrice = async () => { // Data fetching logic updated previously
-    setLoading(true);
-    try {
-      const formattedSymbols = symbols.map(symbol => {
-        return symbol.startsWith('6') ? `sh${symbol}` : `sz${symbol}`;
-      }).join(',');
-      console.log("Formatted Symbols:", formattedSymbols);
-      
-      const apiUrl = `https://qt.gtimg.cn/q=${formattedSymbols}`;
-      console.log("API URL:", apiUrl);
-      
-      // Dynamically create a script tag to bypass CORS
-      const script: HTMLScriptElement = document.createElement('script');
-      script.src = apiUrl;
-      document.body.appendChild(script);
-
-      // Wait for the script to load and define the global variables
-      await new Promise<void>((resolve, reject) => {
-        script.onload = () => {
-          document.body.removeChild(script); // Clean up the script tag
-          resolve();
-        };
-        script.onerror = () => {
-          document.body.removeChild(script);
-          reject(new Error('Failed to load stock data script.'));
-        };
-      });
-
-      const stockData: StockData[] = [];
-      
-      // Iterate through the symbols and read the global variables
-      symbols.forEach(symbol => {
-        const fullCode = symbol.startsWith('6') ? `sh${symbol}` : `sz${symbol}`;
-        const globalVarName = `v_${fullCode}`;
-        
-        // Access the global variable
-        const rawData = (window as unknown as Record<string, string | undefined>)[globalVarName]; // 使用更精确的类型断言替代 any
-        console.log(`Raw Data for ${symbol}:`, rawData);
-        
-        if (rawData) {
-          const data = rawData.split('~');
-          console.log(`Parsed Data for ${symbol}:`, data);
-          if (data.length > 30) {
-            const name = data[1];
-            const price = parseFloat(data[3]);
-            const prevClose = parseFloat(data[4]);
-            const change = price - prevClose;
-            const changesPercentage = parseFloat(data[32]);
-            const marketCap = parseFloat(data[45]) * 10000; // 市值
-            
-            stockData.push({
-              symbol: symbol, // Use original symbol
-              name,
-              price,
-              change,
-              changesPercentage,
-              marketCap: isNaN(marketCap) ? 0 : marketCap
-            });
-          }
-        }
-      });
-      
-      if (stockData.length === 0) {
-        throw new Error("未能解析股票数据");
-      }
-      
-      setStockPrice(stockData);
-      console.log("Final Stock Data:", stockData);
-    } catch (error) {
-      console.error("获取A股价格出错:", error);
-      // Fallback to mock data
-      const mockData = symbols.map((symbol) => {
-        const price = Math.random() * 1000 + 10;
-        const change = (Math.random() * 20) - 10;
-        const changesPercentage = (change / price) * 100;
-        
-        return {
-          symbol,
-          name: getStockName(symbol),
-          price,
-          change,
-          changesPercentage,
-          marketCap: Math.random() * 1e12,
-        };
-      });
-      
-      setStockPrice(mockData);    
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // 获取股票名称的辅助函数
-  const getStockName = (symbol: string): string => {
-    const nameMap: { [key: string]: string } = {
-      "600519": "贵州茅台",
-      "601318": "中国平安",
-      "600036": "招商银行",
-      "601166": "兴业银行",
-      "600276": "恒瑞医药",
-      "000858": "五粮液",
-      "000001": "平安银行",
-      "000002": "万科A",
-      "000333": "美的集团",
-      "000651": "格力电器",
-      "000876": "新希望",
-      "002008": "大族激光",
-      "002230": "科大讯飞",
-      "002415": "海康威视",
-      "002460": "赣锋锂业",
-      "002594": "比亚迪",
-      "300059": "东方财富",
-      "300751": "迈瑞医疗",
-      "600000": "浦发银行",
-      "600016": "民生银行",
-      "600028": "中国石化",
-      "600030": "中信证券",
-      "600050": "中国联通",
-      "600104": "上海汽车",
-      "600196": "复星医药",
-      "600271": "航天信息",
-      "600309": "万华化学",
-      "600438": "通威股份",
-      "600585": "海螺水泥",
-      "600690": "青岛海尔"
-    };
-    return nameMap[symbol] || `股票${symbol}`;
-  };
-  
   useEffect(() => {
-    fetchPrice();
-  }, []);
-  
-  const columns: ColumnType<StockData>[] = [
-    {
-      title: "公司信息",
-      key: "companyInfo",
-      fixed: "left" as const,
-      width: isMobile ? 95 : 110,
-      render: (_, record: StockData) => (
-        <div style={{ lineHeight: '1.2', paddingLeft: isMobile ? '2px' : '4px' }}>
-          <div style={{ fontWeight: 600, fontSize: '11px', marginBottom: '1px', color: '#1a365d' }}>
-            {record.name}
-          </div>
-          <div style={{ fontSize: '9px', color: '#4a5568', opacity: 0.8 }}>
-            {record.symbol}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "当前价格",
-      dataIndex: "price",
-      key: "price",
-      width: isMobile ? 80 : 90,
-      render: (text: number) => (
-        <span style={{ fontWeight: 500, fontSize: '13px' }}>
-          {text !== undefined && text !== null ? `¥${text.toFixed(2)}` : ''}
-        </span>
-      ),
-      sorter: (a: StockData, b: StockData) => b.price - a.price,
-    },
-    {
-      title: "涨跌幅",
-      dataIndex: "changesPercentage",
-      key: "changesPercentage",
-      width: isMobile ? 75 : 85,
-      render: (text: number) => {
-        if (text === undefined || text === null) return '';
-        const color = text >= 0 ? '#ff4d4f' : '#52c41a';
-        const bgColor = text >= 0 ? 'rgba(255, 77, 79, 0.1)' : 'rgba(82, 196, 26, 0.1)';
-        const prefix = text >= 0 ? '+' : '';
-        return (
-          <span style={{ 
-            color, 
-            backgroundColor: bgColor,
-            padding: '2px 6px',
-            borderRadius: '3px',
-            fontSize: '12px',
-            fontWeight: 500
-          }}>
-            {prefix}{text.toFixed(2)}%
-          </span>
-        );
-      },
-      sorter: (a: StockData, b: StockData) => b.changesPercentage - a.changesPercentage,
-    },
-    {
-      title: "涨跌额",
-      dataIndex: "change",
-      key: "change",
-      width: isMobile ? 70 : 80,
-      render: (text: number) => {
-        if (text === undefined || text === null) return '';
-        const color = text >= 0 ? '#ff4d4f' : '#52c41a';
-        const prefix = text >= 0 ? '+' : '';
-        return (
-          <span style={{ color, fontSize: '12px', fontWeight: 500 }}>
-            {prefix}{text.toFixed(2)}
-          </span>
-        );
-      },
-      sorter: (a: StockData, b: StockData) => b.change - a.change,
-    },
-    {
-      title: "市值",
-      dataIndex: "marketCap",
-      key: "marketCap",
-      width: isMobile ? 80 : 90,
-      render: (text: number) => {
-        if (text === undefined || text === null || text === 0) return '';
-        let displayText = '';
-        if (text >= 1e12) displayText = (text / 1e12).toFixed(1) + "万亿";
-        else if (text >= 1e8) displayText = (text / 1e8).toFixed(0) + "亿";
-        else if (text >= 1e4) displayText = (text / 1e4).toFixed(0) + "万";
-        else displayText = text.toString();
+    const fetchData = async () => {
+      try {
+        console.log('开始请求数据...');
         
-        return (
-          <span style={{ fontSize: '12px', color: '#4a5568' }}>
-            {displayText}
-          </span>
+        // 1. 获取实时数据
+        const quoteRes = await fetch(
+          '/api/eastmoney/api/qt/stock/get?secid=105.TSLA&fields=f43,f44,f45,f46,f58,f60,f57,f169,f170'
         );
-      },
-      sorter: (a: StockData, b: StockData) => b.marketCap - a.marketCap,
-    }
+        const quoteJson = await quoteRes.json();
+
+        // 2. 获取历史 K 线数据 (最近 50 天)
+        // klt=101 (日K), lmt=50 (最近50条)
+        // fields2: f51(日期), f52(开盘), f53(收盘), f54(最高), f55(最低), f56(成交量), f57(成交额), f58(振幅), f59(涨跌幅), f60(涨跌额), f61(换手率)
+        const historyRes = await fetch(
+          '/api/eastmoney/kline/api/qt/stock/kline/get?secid=105.TSLA&klt=101&fqt=1&lmt=50&end=20990101&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f59'
+        );
+        const historyJson = await historyRes.json();
+        
+        if (quoteJson.data) {
+          const d = quoteJson.data;
+          setData({
+            name: d.f58,
+            symbol: d.f57,
+            price: d.f43 / 1000,
+            open: d.f46 / 1000,
+            high: d.f44 / 1000,
+            low: d.f45 / 1000,
+            prevClose: d.f60 / 1000,
+            change: d.f169 / 1000,
+            changePercent: d.f170 / 100 
+          });
+        } else {
+          setError('未获取到数据');
+        }
+
+        if (historyJson.data && historyJson.data.klines) {
+          // 解析 K 线字符串数组: "2023-10-27,205.10,207.30,210.00,203.00,1000000,1.5"
+          const klines = historyJson.data.klines.map((item: string) => {
+            const parts = item.split(',');
+            return {
+              date: parts[0],
+              open: parseFloat(parts[1]),
+              close: parseFloat(parts[2]),
+              high: parseFloat(parts[3]),
+              low: parseFloat(parts[4]),
+              volume: parseFloat(parts[5]),
+              changePercent: parseFloat(parts[6])
+            };
+          }).reverse(); // 倒序，最新的在前面
+          setHistory(klines);
+        }
+
+      } catch (err) {
+        console.error(err);
+        setError('请求出错');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <Spin tip="加载中..." style={{ margin: 20 }} />;
+  if (error) return <Card title="错误">{error}</Card>;
+  if (!data) return null;
+
+  const isUp = data.change >= 0;
+  const color = isUp ? '#cf1322' : '#3f8600'; 
+
+  const columns: TableProps<KlineData>['columns'] = [
+    { title: '日期', dataIndex: 'date', key: 'date', width: 110 },
+    { 
+      title: '收盘价', 
+      dataIndex: 'close', 
+      key: 'close', 
+      render: (val: number) => <strong>${val.toFixed(2)}</strong> 
+    },
+    { 
+      title: '涨跌', 
+      dataIndex: 'changePercent', 
+      key: 'changePercent',
+      render: (val: number) => {
+        const isUp = val >= 0;
+        const color = isUp ? '#cf1322' : '#3f8600';
+        return (
+          <Tag color={isUp ? 'error' : 'success'} style={{ fontWeight: 'bold' }}>
+            {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+            {Math.abs(val).toFixed(2)}%
+          </Tag>
+        );
+      }
+    },
+    { 
+      title: '成交量', 
+      dataIndex: 'volume', 
+      key: 'volume', 
+      render: (val: number) => {
+        // 格式化成交量，例如 12345678 -> 1234.57万 或 12.35M
+        if (val > 100000000) return `${(val / 100000000).toFixed(2)}亿`;
+        if (val > 10000) return `${(val / 10000).toFixed(2)}万`;
+        return val;
+      }
+    },
+    { title: '开盘', dataIndex: 'open', key: 'open', render: (val: number) => val.toFixed(2), responsive: ['md'] },
+    { title: '最高', dataIndex: 'high', key: 'high', render: (val: number) => val.toFixed(2), responsive: ['md'] },
+    { title: '最低', dataIndex: 'low', key: 'low', render: (val: number) => val.toFixed(2), responsive: ['md'] },
   ];
 
   return (
-    <div className="astock-container">
-      <Row className="astock-header" justify="center" align="middle" style={{ marginBottom: "12px" }}>
-        <Col xs={24} sm={24} md={12} lg={12} xl={12} style={{ textAlign: "center" }}>
-          <h2 className="astock-title" style={{ margin: 0 }}>中国A股市场</h2>
-        </Col>
-        <Col xs={24} sm={24} md={12} lg={12} xl={12} style={{ textAlign: isMobile ? "center" : "right", marginTop: isMobile ? "10px" : "0" }}>
-          <Button className="refresh-btn" onClick={fetchPrice} loading={loading}>
-            {loading ? "加载中..." : "刷新行情"}
-          </Button>
-        </Col>
-      </Row>
-      <div className="table-hscroll">
-        <Table
-          className="astock-table"
-          columns={columns}
-          dataSource={(() => {
-            const startIndex = (current - 1) * pageSize;
-            const endIndex = current * pageSize;
-            const currentPageData = stockPrice.slice(startIndex, endIndex);
-            const paddedData = [...currentPageData];
-            while (paddedData.length < pageSize) {
-              paddedData.push({
-                symbol: `empty-${paddedData.length}`,
-                name: '',
-                price: 0,
-                changesPercentage: 0,
-                marketCap: 0,
-                change: 0,
-              });
-            }
-            return paddedData;
-          })()}
-          pagination={false}
-          rowKey={(record: StockData, index?: number) => record.symbol || String(index)}
-          scroll={{ x: isMobile ? 320 : 365 }}
-          size="middle"
+    <Card title={`${data.name} (${data.symbol}) - 最近50日行情`} style={{ maxWidth: 1000, margin: '20px auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+        <Statistic
+          title="当前价格"
+          value={data.price}
+          precision={2}
+          valueStyle={{ color: color, fontSize: 32, fontWeight: 'bold' }}
+          prefix={isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+          suffix="$"
         />
+        <div style={{ marginLeft: 40 }}>
+            <Statistic
+              title="涨跌幅"
+              value={data.changePercent}
+              precision={2}
+              valueStyle={{ color: color }}
+              prefix={isUp ? '+' : ''}
+              suffix="%"
+            />
+             <Statistic
+              title="涨跌额"
+              value={data.change}
+              precision={2}
+              valueStyle={{ color: color }}
+              prefix={isUp ? '+' : ''}
+            />
+        </div>
       </div>
-      <Row justify="center" style={{ marginTop: 8 }}>
-        <Col>
-          <div className="custom-pagination">
-            {/* 自定义分页器 */}
-            <div className="custom-pagination-controls">
-              {/* 上一页按钮 */}
-              <Button
-                size="small"
-                disabled={current === 1}
-                onClick={() => setCurrent(current - 1)}
-                className="custom-pagination-btn"
-              >
-                ‹
-              </Button>
-              
-              {/* 当前页显示 */}
-              <span className="custom-pagination-current">
-                {current}
-              </span>
-              
-              {/* 下一页按钮 */}
-              <Button
-                size="small"
-                disabled={current === Math.ceil(stockPrice.length / pageSize)}
-                onClick={() => setCurrent(current + 1)}
-                className="custom-pagination-btn"
-              >
-                ›
-              </Button>
-            </div>
-            
-            {/* 页码选择下拉菜单 */}
-            <Select
-              value={current}
-              onChange={(value) => setCurrent(value)}
-              size="small"
-              className="custom-pagination-select"
-              style={{ minWidth: '80px' }}
-              placeholder="跳转"
-            >
-              {Array.from({ length: Math.ceil(stockPrice.length / pageSize) }, (_, i) => i + 1).map(page => (
-                <Select.Option key={page} value={page}>
-                  第 {page} 页
-                </Select.Option>
-              ))}
-            </Select>
-            
-            {/* 总页数显示 */}
-            <span className="custom-pagination-info">
-              共 {Math.ceil(stockPrice.length / pageSize)} 页
-            </span>
-          </div>
-        </Col>
-      </Row>
-    </div>
-  );
-};
 
-export default AStock;
+      <Tabs defaultActiveKey="1" items={[
+        {
+          key: '1',
+          label: '基本信息',
+          children: (
+            <Descriptions column={2} bordered>
+              <Descriptions.Item label="今开">{data.open.toFixed(2)}</Descriptions.Item>
+              <Descriptions.Item label="昨收">{data.prevClose.toFixed(2)}</Descriptions.Item>
+              <Descriptions.Item label="最高">{data.high.toFixed(2)}</Descriptions.Item>
+              <Descriptions.Item label="最低">{data.low.toFixed(2)}</Descriptions.Item>
+            </Descriptions>
+          )
+        },
+        {
+          key: '2',
+          label: '最近5日行情',
+          children: (
+            <Table
+              dataSource={history}
+              columns={columns}
+              rowKey="date"
+              pagination={false}
+              size="small"
+            />
+          )
+        }
+      ]} />
+    </Card>
+  );
+}
